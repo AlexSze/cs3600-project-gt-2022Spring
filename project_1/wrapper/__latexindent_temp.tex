@@ -1,0 +1,48 @@
+\documentclass[12pt]{extarticle}
+\usepackage[utf8]{inputenc}
+
+\title{CS 3600 Project 1 Wrapper}
+\author{CS 3600 - Spring 2022}
+\date{Due February 13th 2022 at 11:59pm EST via Gradescope}
+
+\begin{document}
+
+\maketitle
+
+\section*{Introduction}
+
+This Project Wrapper consists of a context paragraph, which identifies the topic of the wrapper, followed by four short-answer questions, each worth 1 point. Please limit your response to each question to \textbf{a maximum of 200 words}. Please write complete English sentences, but our focus is on the content of what you are writing and not your grammar. The goal of this assignment is to train your ability to reason through the consequences and ethical implications of computational intelligence. You should not focus on getting "the right answer," because the questions may be inherently open-ended or subject to interpretation.  Instead, focus on demonstrating that you are able to consider the impacts of your AI design choices.  \textbf{NOTE:} For this first wrapper, we have provided an answer for Question 1, to illustrate the length and quality of responses that we are looking for. This sample answer is around 100 words in length and will receive full credit (a free point for you!) Note that you are not required to answer this question.
+
+\section*{Context}
+
+Consider a map of all of the roads in a city.  A driver in this city is using a GPS app which locates the user’s position on the map, and uses a A* implementation to identify an optimum route to the driver’s destination using an admissible and consistent heuristic.  Considering the intersections between roads to be the states, and the  roads  connecting the states to be the edges, denoting the possible actions, please answer  the  following questions.
+
+\newpage
+\section*{Question 1}
+
+In the ice cream example in class, we used the length of roads as the edge cost between vertices (ice cream shops), and the resulting optimal route gave the shortest distance a car would have to travel by following the roads. How might we modify the search to account for speed limits?  How might we account for traffic conditions if we know that traffic is flowing slower than the speed limit? \\
+
+\noindent\textbf{Example Answer (1 Free Point):} Speed limits and traffic affect \emph{time} instead of distance, and so we can modify the edge costs to encode time. If there is an average speed $v_a$ in miles/hour, then for an original graph edge cost $d$ in miles, we can replace it with a new edge cost $t = d/v_a$ in hours. We can now account for speed limits and traffic conditions by simply modifying the average speed for that edge to reflect the speed limit or a reduced average speed due to traffic conditions. As long as we have a consistent heuristic function, A* with the new costs will find the shortest duration path, which might not be the shortest distance path under the original cost model.
+
+\newpage
+\section*{Question 2}
+
+Suppose there is a residential neighborhood where a lot of children live and play in the streets, which happens to be located between two very popular destinations. As more people use GPS-based route planning services, the neighborhood has started to see an increase in dangerously-fast traffic. Suppose we wanted to discourage A* from routing cars through the neighborhood. What would happen if we artificially adjusted the speed limit on roads in the neighborhood versus if we artificially increased the heuristic values of intersections in the neighborhood?   Would either approach guarantee that cars never cut through the neighborhood? Would either approach prevent people who live in the neighborhood from generating routes to and from their homes? \\
+
+\noindent\textbf{Answer:} The questions depend on what attribute do our A* algorithm takes into account. If it is the A* in ice cream example in class which only takes distance into account, changing the speed limit alone does not affect the result. Hence, do not discourage A* from routing cars through the neighbourhood. But, if the A* takes speed or time as an attribute, it can discourage A* from routing cars through the neighbourhood since lowering speed means high time cost. On the other hand, increasing the heuristic will do the job since it makes the algorithm thinks that passing this route will increase the cost. However, artificially adjusting the heuristic could sometimes lead to inconsistency. Both approaches will not guarantee cars never cut through the neighbourhood. A* is a function that combines heuristic and cost. If the cost difference of multiple routes is large, the heuristic can hardly affect the result. Hence can not completely stop the cars cutting through the neighbourhood. Last but not least, if both approaches are consistent, it does not prevent people who live in the neighbourhood from generating routes to and from their homes. (188 words)
+
+\newpage
+\section*{Question 3}
+
+There is currently a big societal concern regarding artificial intelligence and automation affecting jobs.  How do route planning systems (such as Google Maps or Uber navigation) impact jobs?  Is their impact mainly positive or mainly negative?\\
+
+\noindent\textbf{Answer:} I would say that the route planning system today Is more like an assistance role. It helps people to navigate easier but does not replace people directly. However, the route planning system enabled non-professional drivers to enter the cab industry which shared taxi drivers customers pool. So it might make taxi drivers harder to find customers. I would argue that this impact is mainly positive. Looking back into the industrial revolution, in the short term, people might find it more difficult to find jobs since machines are taking over. However, in a long term, the industrial revolution free labour-power from low-value and repetitive jobs. The labour force is shifted to higher-value and more exciting jobs. Therefore I believe that a similar thing will happen when people popularise the use of AI. And AI will restructure the job market in a good way. (142 words)
+
+\newpage
+\section*{Question 4}
+
+Reliance on artificial intelligence systems can change human behavior in unanticipated ways.  Describe one way in which a route planning system can have an undesirable impact on human behavior.\\
+
+\noindent\textbf{Answer:} The route planning system is too convenient today, and people are heavily relying on it. Hence, people are not memorising routes and locations anymore, and we let the system decide for us. For example, when we want to go to a supermarket nowadays, we sometimes just type in "supermarket" on the map and let it decide which supermarket and which branch to visit. As a result, we are now more likely to be affected by ads. In Google Maps, for example, paid stores are easier to get searched by users because they rank higher in the search result. Therefore, the supermarket that the map recommend us to go to might not be the most suitable for us. People lost their free-will without realising it. (124 words)
+
+\end{document}
