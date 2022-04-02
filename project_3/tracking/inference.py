@@ -295,17 +295,13 @@ class ExactInference(InferenceModule):
         position is known.
         """
         "*** YOUR CODE HERE ***"
-        # store in temp belief
         tempBelief = util.Counter()
-        noiceDistance = observation
-        pacPos = gameState.getPacmanPosition()
 
-        # loop through all positions
         for gPos in self.allPositions:
-            # P(noisy distance | true position )
+            # P(noisyDistance | pacmanPosition, ghostPosition) -> P(noisy distance | true distance )
             positionProb = self.getObservationProb(
-                noiceDistance, pacPos, gPos, self.getJailPosition())
-            # Pi(ghost in current position) = P(noisy distance | true position ) * Pi-1(ghost in current position)
+                observation, gameState.getPacmanPosition(), gPos, self.getJailPosition())
+            # Pi(ghost in current position) = P(noisy distance | true distance ) * Pi-1(ghost in current position)
             tempBelief[gPos] = positionProb * self.beliefs[gPos]
 
         tempBelief.normalize()
@@ -331,17 +327,13 @@ class ExactInference(InferenceModule):
 
         """
         "*** YOUR CODE HERE ***"
-        # store in temp belief
         tempBelief = util.Counter()
 
-        # loop through all positions
         for oldPos in self.allPositions:
-            print(oldPos)
             newPosDist = self.getPositionDistribution(gameState, oldPos)
             for newPos in newPosDist:
-                # Pi(ghost in new position) = SUM{Pi-1(ghost in old position) * P(apears in this new position)}
-                tempBelief[newPos] = tempBelief[newPos] + \
-                    self.beliefs[oldPos] * newPosDist[newPos]
+                # P(xt) = SUM{P(xt | xt-1) * P(xt-1)}
+                tempBelief[newPos] += newPosDist[newPos] * self.beliefs[oldPos]
 
         tempBelief.normalize()
         self.beliefs = tempBelief
@@ -372,6 +364,7 @@ class ParticleFilter(InferenceModule):
         """
         self.particles = []
         "*** YOUR CODE HERE ***"
+        # initialise so that each pos have same number of particles
         for pos in self.legalPositions:
             for i in range(self.numParticles // len(self.legalPositions)):
                 self.particles.append(pos)
@@ -399,21 +392,21 @@ class ParticleFilter(InferenceModule):
 
         """
         "*** YOUR CODE HERE ***"
-        pacPos = gameState.getPacmanPosition()
         temp = DiscreteDistribution()
         tempParticles = []
 
         for particle in self.particles:
-            # P(noisyDistance | pacmanPosition, particle)
+            # P(noisyDistance | pacmanPosition, ghostPosition) -> P(noisy distance | true distance )
+            # samples at each position
             particleProb = self.getObservationProb(
-                observation, pacPos, particle, self.getJailPosition())
+                observation, gameState.getPacmanPosition(), particle, self.getJailPosition())
             temp[particle] += particleProb
 
         #  reinitialize when all particles receive zero weight
         if (temp.total() == 0):
             self.initializeUniformly(gameState)
         else:
-            for i in range(self.numParticles):
+            for _ in range(self.numParticles):
                 # Resample
                 tempParticles.append(temp.sample())
             self.particles = tempParticles
@@ -435,10 +428,13 @@ class ParticleFilter(InferenceModule):
         "*** YOUR CODE HERE ***"
         tempPartic = []
         for particle in self.particles:
+            # possible position distrubution
             newPosProb = self.getPositionDistribution(gameState, particle)
+            # initialise a distribution
             temp = DiscreteDistribution(newPosProb)
             # Sample
             tempPartic.append(temp.sample())
+
         self.particles = tempPartic
 
     def getBeliefDistribution(self):
