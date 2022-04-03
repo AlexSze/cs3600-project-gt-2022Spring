@@ -431,9 +431,8 @@ class ParticleFilter(InferenceModule):
         for particle in self.particles:
             # possible position distrubution
             newPosProb = self.getPositionDistribution(gameState, particle)
-            temp = DiscreteDistribution(newPosProb)
             # Sample
-            tempParticle.append(temp.sample())
+            tempParticle.append(newPosProb.sample())
 
         self.particles = tempParticle
 
@@ -482,7 +481,7 @@ class JointParticleFilter(ParticleFilter):
         temp = list(itertools.product(
             self.legalPositions, repeat=self.numGhosts))
         for pos in temp:
-            for i in range(self.numParticles // len(self.legalPositions)):
+            for _ in range(self.numParticles // len(self.legalPositions)):
                 self.particles.append(pos)
         random.shuffle(self.particles)
         self.particles = self.particles[:self.numParticles]
