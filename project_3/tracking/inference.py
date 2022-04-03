@@ -298,10 +298,10 @@ class ExactInference(InferenceModule):
         tempBelief = util.Counter()
 
         for gPos in self.allPositions:
-            # P(noisyDistance | pacmanPosition, ghostPosition) -> P(noisy distance | true distance )
+            # P(noisyDistance | pacmanPosition, ghostPosition) -> P(noisy distance | true distance ) -> position prob
             positionProb = self.getObservationProb(
                 observation, gameState.getPacmanPosition(), gPos, self.getJailPosition())
-            # Pi(ghost in current position) = P(noisy distance | true distance ) * Pi-1(ghost in current position)
+            # new belief = position prob * old belief
             tempBelief[gPos] = positionProb * self.beliefs[gPos]
 
         tempBelief.normalize()
@@ -392,23 +392,24 @@ class ParticleFilter(InferenceModule):
 
         """
         "*** YOUR CODE HERE ***"
-        temp = DiscreteDistribution()
+        newBelief = DiscreteDistribution()
+        oldBelief = self.getBeliefDistribution()
         tempParticles = []
 
         for particle in self.particles:
-            # P(noisyDistance | pacmanPosition, ghostPosition) -> P(noisy distance | true distance )
+            # P(noisyDistance | pacmanPosition, ghostPosition) -> P(noisy distance | true distance ) -> position prob
             # samples at each position
             particleProb = self.getObservationProb(
                 observation, gameState.getPacmanPosition(), particle, self.getJailPosition())
-            temp[particle] += particleProb
+            newBelief[particle] = particleProb * oldBelief[particle]
 
         #  reinitialize when all particles receive zero weight
-        if (temp.total() == 0):
+        if (newBelief.total() == 0):
             self.initializeUniformly(gameState)
         else:
             for _ in range(self.numParticles):
                 # Resample
-                tempParticles.append(temp.sample())
+                tempParticles.append(newBelief.sample())
             self.particles = tempParticles
 
     def elapseTime(self, gameState):
@@ -426,16 +427,15 @@ class ParticleFilter(InferenceModule):
 
         """
         "*** YOUR CODE HERE ***"
-        tempPartic = []
+        tempParticle = []
         for particle in self.particles:
             # possible position distrubution
             newPosProb = self.getPositionDistribution(gameState, particle)
-            # initialise a distribution
             temp = DiscreteDistribution(newPosProb)
             # Sample
-            tempPartic.append(temp.sample())
+            tempParticle.append(temp.sample())
 
-        self.particles = tempPartic
+        self.particles = tempParticle
 
     def getBeliefDistribution(self):
         """
@@ -479,8 +479,13 @@ class JointParticleFilter(ParticleFilter):
         """
         self.particles = []
         "*** YOUR CODE HERE ***"
-
-        raiseNotDefined()
+        temp = list(itertools.product(
+            self.legalPositions, repeat=self.numGhosts))
+        for pos in temp:
+            for i in range(self.numParticles // len(self.legalPositions)):
+                self.particles.append(pos)
+        random.shuffle(self.particles)
+        self.particles = self.particles[:self.numParticles]
 
     def addGhostAgent(self, agent):
         """
@@ -523,8 +528,32 @@ class JointParticleFilter(ParticleFilter):
 
         """
         "*** YOUR CODE HERE ***"
+        newBelieve = DiscreteDistribution()
+        oldBelieve = self.getBeliefDistribution()
+        tempParticles = []
 
-        raiseNotDefined()
+        for particle in self.particles:
+            prob = 1
+            posList = list()
+            for i in range(self.numGhosts):
+                if (observation[i] is not None):
+                    tempProb = self.getObservationProb(
+                        observation[i], gameState.getPacmanPosition(), particle[i], self.getJailPosition(i))
+                    prob = prob * tempProb
+                    posList.append(particle[i])
+                else:
+                    posList.append(self.getJailPosition(i))
+            particle = tuple(posList)
+            newBelieve[particle] = oldBelieve[particle] * prob
+
+        #  reinitialize when all particles receive zero weight
+        if (newBelieve.total() == 0):
+            self.initializeUniformly(gameState)
+        else:
+            for _ in range(self.numParticles):
+                # Resample
+                tempParticles.append(newBelieve.sample())
+            self.particles = tempParticles
 
     def elapseTime(self, gameState):
         """
@@ -547,7 +576,13 @@ class JointParticleFilter(ParticleFilter):
 
             # now loop through and update each entry in newParticle...
             "*** YOUR CODE HERE ***"
-            raiseNotDefined()
+            tempNewParticle = list()
+            # for prevGhostPositions in newParticle:
+            for i in range(self.numGhosts):
+                newPosDist = self.getPositionDistribution(
+                    gameState, newParticle, i, self.ghostAgents[i])
+                tempNewParticle.append(newPosDist.sample())
+            newParticle = tempNewParticle
 
             """*** END YOUR CODE HERE ***"""
             newParticles.append(tuple(newParticle))
