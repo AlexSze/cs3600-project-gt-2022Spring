@@ -74,38 +74,40 @@ def testCarData(hiddenLayers=[16]):
 #           average(carResult), ' sd: ', stDeviation(carResult))
 
 
-# # question 7
-# xorData = [[[[0, 0], [0]], [[0, 1], [1]], [[1, 0], [1]], [[1, 1], [0]]],
-#            [[[0, 0], [0]], [[0, 1], [1]], [[1, 0], [1]], [[1, 1], [0]]]]
+# question 7
+xorData = [[([0, 0], [0]), ([0, 1], [1]), ([1, 0], [1]), ([1, 1], [0])],
+           [([0, 0], [0]), ([0, 1], [1]), ([1, 0], [1]), ([1, 1], [0])]]
 
 
-# def testXorData(hiddenLayers=[0]):
-#     return buildNeuralNet(xorData, maxItr=5000, hiddenLayerList=hiddenLayers)
-
-
-# xorPerceptron = [0]
-# k = 0
-# while k != 1.0:
-#     xorPerceptron[0] += 1
-#     nnet, k = testXorData(xorPerceptron)
-
-# print(xorPerceptron, k)
-
-
-# question 8
-xorData = buildExamplesFromExtraData()
-
-
-def testXorData(hiddenLayers=[25]):
+def testXorData(hiddenLayers=[10]):
     return buildNeuralNet(xorData, maxItr=500, hiddenLayerList=hiddenLayers)
 
 
-q8Result = []
+xorPerceptron = [0]
+k = 0
+while k != 1.0:
+    xorPerceptron[0] += 1
+    nnet, k = testXorData(xorPerceptron)
 
-for _ in range(5):
-    nnet, j = testXorData()
+nnet, p = testXorData([0])
+print([0], p)
+print(xorPerceptron, k)
 
-    q8Result.append(j)
 
-print('q8Result, max: ', max(q8Result), ' average: ',
-      average(q8Result), ' sd: ', stDeviation(q8Result))
+# # question 8
+# xorData = buildExamplesFromExtraData()
+
+
+# def testXorData(hiddenLayers=[25]):
+#     return buildNeuralNet(xorData, maxItr=500, hiddenLayerList=hiddenLayers)
+
+
+# q8Result = []
+
+# for _ in range(5):
+#     nnet, j = testXorData()
+
+#     q8Result.append(j)
+
+# print('q8Result, max: ', max(q8Result), ' average: ',
+#       average(q8Result), ' sd: ', stDeviation(q8Result))
