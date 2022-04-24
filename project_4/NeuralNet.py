@@ -331,7 +331,7 @@ def buildNeuralNet(examples, alpha=0.1, weightChangeThreshold=0.00008, hiddenLay
     Iterate for as long as it takes to reach weight modification threshold
     """
     weightMod = weightChangeThreshold + 1
-    while (iteration < maxItr and weightMod > weightChangeThreshold):
+    while (weightMod > weightChangeThreshold and iteration < maxItr):
         iteration += 1
         trainError, weightMod = nnet.backPropLearning(examplesTrain, alpha)
         if iteration % 10 == 0:
