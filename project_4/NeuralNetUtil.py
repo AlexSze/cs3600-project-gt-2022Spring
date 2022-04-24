@@ -1,72 +1,82 @@
-#utility functions for neural net project
+# utility functions for neural net project
 import random
+
+
 def getNNPenData(fileString="datasets/pendigits.txt", limit=100000):
     """
     returns limit # of examples from penDigits file
     """
-    examples=[]
+    examples = []
     data = open(fileString)
     lineNum = 0
     for line in data:
-        inVec = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-        outVec = [0,0,0,0,0,0,0,0,0,0]                      #which digit is output
-        count=0
+        inVec = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        outVec = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # which digit is output
+        count = 0
         for val in line.split(','):
-            if count==16:
+            if count == 16:
                 outVec[int(val)] = 1
             else:
-                inVec[count] = int(val)/100.0               #need to normalize values for inputs
-            count+=1
-        examples.append((inVec,outVec))
+                # need to normalize values for inputs
+                inVec[count] = int(val)/100.0
+            count += 1
+        examples.append((inVec, outVec))
         lineNum += 1
         if (lineNum >= limit):
             break
     return examples
 
-def getList(num,length):
+
+def getList(num, length):
     list = [0]*length
     list[num-1] = 1
     return list
-    
-def getNNCarData(fileString ="datasets/car.data.txt", limit=100000 ):
+
+
+def getNNCarData(fileString="datasets/car.data.txt", limit=100000):
     """
     returns limit # of examples from file passed as string
     """
-    examples=[]
-    attrValues={}
+    examples = []
+    attrValues = {}
     data = open(fileString)
-    attrs = ['buying','maint','doors','persons','lug_boot','safety']
+    attrs = ['buying', 'maint', 'doors', 'persons', 'lug_boot', 'safety']
     attr_values = [['vhigh', 'high', 'med', 'low'],
-                 ['vhigh', 'high', 'med', 'low'],
-                 ['2','3','4','5more'],
-                 ['2','4','more'],
-                 ['small', 'med', 'big'],
-                 ['high', 'med', 'low']]
-    
-    attrNNList = [('buying', {'vhigh' : getList(1,4), 'high' : getList(2,4), 'med' : getList(3,4), 'low' : getList(4,4)}),
-                 ('maint',{'vhigh' : getList(1,4), 'high' : getList(2,4), 'med' : getList(3,4), 'low' : getList(4,4)}),
-                 ('doors',{'2' : getList(1,4), '3' : getList(2,4), '4' : getList(3,4), '5more' : getList(4,4)}),
-                 ('persons',{'2' : getList(1,3), '4' : getList(2,3), 'more' : getList(3,3)}),
-                 ('lug_boot',{'small' : getList(1,3),'med' : getList(2,3),'big' : getList(3,3)}),
-                 ('safety',{'high' : getList(1,3), 'med' : getList(2,3),'low' : getList(3,3)})]
+                   ['vhigh', 'high', 'med', 'low'],
+                   ['2', '3', '4', '5more'],
+                   ['2', '4', 'more'],
+                   ['small', 'med', 'big'],
+                   ['high', 'med', 'low']]
 
-    classNNList = {'unacc' : [1,0,0,0], 'acc' : [0,1,0,0], 'good' : [0,0,1,0], 'vgood' : [0,0,0,1]}
-    
+    attrNNList = [('buying', {'vhigh': getList(1, 4), 'high': getList(2, 4), 'med': getList(3, 4), 'low': getList(4, 4)}),
+                  ('maint', {'vhigh': getList(1, 4), 'high': getList(
+                      2, 4), 'med': getList(3, 4), 'low': getList(4, 4)}),
+                  ('doors', {'2': getList(1, 4), '3': getList(2, 4),
+                   '4': getList(3, 4), '5more': getList(4, 4)}),
+                  ('persons', {'2': getList(1, 3), '4': getList(
+                      2, 3), 'more': getList(3, 3)}),
+                  ('lug_boot', {'small': getList(1, 3),
+                   'med': getList(2, 3), 'big': getList(3, 3)}),
+                  ('safety', {'high': getList(1, 3), 'med': getList(2, 3), 'low': getList(3, 3)})]
+
+    classNNList = {'unacc': [1, 0, 0, 0], 'acc': [
+        0, 1, 0, 0], 'good': [0, 0, 1, 0], 'vgood': [0, 0, 0, 1]}
+
     for index in range(len(attrs)):
-        attrValues[attrs[index]]=attrNNList[index][1]
+        attrValues[attrs[index]] = attrNNList[index][1]
 
     lineNum = 0
     for line in data:
         inVec = []
         outVec = []
-        count=0
+        count = 0
         for val in line.split(','):
-            if count==6:
+            if count == 6:
                 outVec = classNNList[val[:val.find('\n')]]
             else:
                 inVec.append(attrValues[attrs[count]][val])
-            count+=1
-        examples.append((inVec,outVec))
+            count += 1
+        examples.append((inVec, outVec))
         lineNum += 1
         if (lineNum >= limit):
             break
@@ -77,16 +87,18 @@ def getNNCarData(fileString ="datasets/car.data.txt", limit=100000 ):
 def buildExamplesFromPenData(size=10000):
     """
     build Neural-network friendly data struct
-            
+
     pen data format
     16 input(attribute) values from 0 to 100
     10 possible output values, corresponding to a digit from 0 to 9
 
     """
     if (size != 10000):
-        penDataTrainList = getNNPenData("datasets/pendigitsTrain.txt",int(.8*size))
-        penDataTestList = getNNPenData("datasets/pendigitsTest.txt",int(.2*size))
-    else :    
+        penDataTrainList = getNNPenData(
+            "datasets/pendigitsTrain.txt", int(.8*size))
+        penDataTestList = getNNPenData(
+            "datasets/pendigitsTest.txt", int(.2*size))
+    else:
         penDataTrainList = getNNPenData("datasets/pendigitsTrain.txt")
         penDataTestList = getNNPenData("datasets/pendigitsTest.txt")
     return penDataTrainList, penDataTestList
@@ -95,7 +107,7 @@ def buildExamplesFromPenData(size=10000):
 def buildExamplesFromCarData(size=200):
     """
     build Neural-network friendly data struct
-            
+
     car data format
     | names file (C4.5 format) for car evaluation domain
 
@@ -116,18 +128,18 @@ def buildExamplesFromCarData(size=200):
     carDataTrainList = []
     for cdRec in carData:
         tmpInVec = []
-        for cdInRec in cdRec[0] :
-            for val in cdInRec :
+        for cdInRec in cdRec[0]:
+            for val in cdInRec:
                 tmpInVec.append(val)
-        #print "in :" + str(cdRec) + " in vec : " + str(tmpInVec)
+        # print "in :" + str(cdRec) + " in vec : " + str(tmpInVec)
         tmpList = (tmpInVec, cdRec[1])
         carDataTrainList.append(tmpList)
-    #print "car data list : " + str(carDataList)
+    # print "car data list : " + str(carDataList)
     random.shuffle(carDataTrainList)
     carDataTestList = carDataTrainList[-size:]
     carDataTrainList = carDataTrainList[:-size]
     return carDataTrainList, carDataTestList
-    
+
 
 def buildPotentialHiddenLayers(numIns, numOuts):
     """
@@ -142,12 +154,12 @@ def buildPotentialHiddenLayers(numIns, numOuts):
     if (maxNumNodes > 15):
         maxNumNodes = 15
 
-    for lyr1cnt in range(numOuts,maxNumNodes):
-        for lyr2cnt in range(numOuts-1,lyr1cnt+1):
-            for lyr3cnt in range(numOuts-1,lyr2cnt+1):
+    for lyr1cnt in range(numOuts, maxNumNodes):
+        for lyr2cnt in range(numOuts-1, lyr1cnt+1):
+            for lyr3cnt in range(numOuts-1, lyr2cnt+1):
                 if (lyr2cnt == numOuts-1):
                     lyr2cnt = 0
-                
+
                 if (lyr3cnt == numOuts-1):
                     lyr3cnt = 0
                 tmpList.append(lyr1cnt)
@@ -156,3 +168,49 @@ def buildPotentialHiddenLayers(numIns, numOuts):
                 resList.append(tmpList)
                 tmpList = []
     return resList
+
+
+def getNNQ8Data(fileString="datasets/q8TrainData.txt", limit=100000):
+    """
+    returns limit # of examples from penDigits file
+    """
+    examples = []
+    data = open(fileString)
+    lineNum = 0
+    for line in data:
+        inVec = [0, 0, 0, 0]
+        outVec = [0]  # which digit is output
+        count = 0
+        for val in line.split(','):
+            if count == 4:
+                outVec[0] = int(val)
+            else:
+                # need to normalize values for inputs
+                inVec[count] = float(val)
+            count += 1
+        examples.append((inVec, outVec))
+        lineNum += 1
+        if (lineNum >= limit):
+            break
+    return examples
+
+
+def buildExamplesFromExtraData(size=200):
+    """
+    build Neural-network friendly data struct
+
+    | Class (0 for authentic, 1 for inauthentic).
+
+    0, 1
+
+    | attributes
+
+    Variance of Wavelet Transformed image (continuous).
+    Skewness of Wavelet Transformed image (continuous).
+    Kurtosis of Wavelet Transformed image (continuous).
+    Entropy of image (continuous).
+
+    """
+    q8DataTrainList = getNNQ8Data("datasets/q8TrainData.txt")
+    q8DataTestList = getNNQ8Data("datasets/q8TestData.txt")
+    return q8DataTrainList, q8DataTestList
